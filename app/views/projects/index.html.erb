@@ -1,0 +1,76 @@
+<% content_for :header_tags do %>
+    <%= auto_discovery_link_tag(:atom, {:action => 'index', :format => 'atom', :key => User.current.rss_key}) %>
+<% end %>
+
+<div class="contextual">
+  <%= render_project_action_links %>
+</div>
+
+<h2><%= l(:label_project_plural) %></h2>
+
+<div id="projects-index">
+  <div class="autoscroll">
+    <table class="list projects">
+      <thead>
+        <tr>
+          <th><%=l(:label_project)%></th>
+          <th><%= l(:field_description) %></th>
+          <th><%= l(:label_organization_plural)%></th>
+          <% unless @custom_fields.empty? -%>
+            <% @custom_fields.each do |field| -%>
+              <th><%= field.name %></th>
+            <% end %>
+          <% end %>
+          <th><%=l(:field_created_on)%></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% project_tree(@projects) do |project, level| %>
+          <tr class="<%= cycle('odd', 'even') %> <%= project.css_classes %> <%= level > 0 ? "idnt idnt-#{level}" : nil %>">
+            <td class="name">
+              <span class="<%= User.current.member_of?(project) ? 'my-project' : nil %>">
+                <%= link_to_project(project, {}, :title => project.short_description) %>
+              </span>
+            </td>
+            <td class="wiki description">
+              <%= textilizable(project.short_description, :project => project) if project.description.present? %>
+            </td>
+            <td>
+              <% project.organizations.each do |organization| -%>
+                <span>
+                  <%= link_to_organization organization %>
+                </span>
+              <% end %>
+            </td>
+            <% unless project.custom_field_values.empty? -%>
+              <% project.custom_field_values.each do |custom| -%>
+                <td><%= custom.value %></td>
+              <% end %>
+            <% end %>
+            <td><%= format_date(project.created_on) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<% if User.current.logged? %>
+<p style="text-align:right;">
+<span class="my-project"><%= l(:label_my_projects) %></span>
+</p>
+<% end %>
+
+<% other_formats_links do |f| %>
+  <%= f.link_to 'Atom', :url => {:key => User.current.rss_key} %>
+<% end %>
+
+<% content_for :sidebar do %>
+  <%= form_tag({}, :method => :get) do %>
+    <h3><%= l(:label_project_plural) %></h3>
+    <label for="closed"><%= check_box_tag 'closed', 1, params[:closed] %> <%= l(:label_show_closed_projects) %></label>
+    <p><%= submit_tag l(:button_apply), :class => 'button-small', :name => nil %></p>
+  <% end %>
+<% end %>
+
+<% html_title(l(:label_project_plural)) -%>
