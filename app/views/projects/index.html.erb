@@ -13,15 +13,16 @@
     <table class="list projects">
       <thead>
         <tr>
-          <th><%=l(:label_project)%></th>
-          <th><%= l(:field_description) %></th>
-          <th><%= l(:label_organization_plural)%></th>
+          <th><%= l(:label_project) %></th>
+          <th><%= l(:label_issue_plural) %></th>
+          <th><%= l(:label_organization_plural) %></th>
           <% unless @custom_fields.empty? -%>
             <% @custom_fields.each do |field| -%>
               <th><%= field.name %></th>
             <% end %>
           <% end %>
-          <th><%=l(:field_created_on)%></th>
+          <th><%= l(:field_description) %></th>
+          <th><%= l(:field_created_on)%></th>
         </tr>
       </thead>
       <tbody>
@@ -32,8 +33,10 @@
                 <%= link_to_project(project, {}, :title => project.short_description) %>
               </span>
             </td>
-            <td class="wiki description">
-              <%= textilizable(project.short_description, :project => project) if project.description.present? %>
+            <td>
+              <%= link_to project.issues.count, project_path(id: project.id, jump: :issues) %>
+              <%= link_to (content_tag(:i, 'add', class: 'material-icons') +
+         (content_tag(:span, l(:label_issue_new), class: 'mdl-tooltip', for: "org-table-add-issue-#{project.id}"))), new_project_issue_path(project), id: "org-table-add-issue-#{project.id}" %>
             </td>
             <td>
               <% project.organizations.each do |organization| -%>
@@ -47,6 +50,9 @@
                 <td><%= custom.value %></td>
               <% end %>
             <% end %>
+            <td class="wiki description">
+              <%= textilizable(project.short_description, :project => project) if project.description.present? %>
+            </td>
             <td><%= format_date(project.created_on) %></td>
           </tr>
         <% end %>
