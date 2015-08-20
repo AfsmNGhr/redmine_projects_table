@@ -6,6 +6,12 @@
   <%= render_project_action_links %>
 </div>
 
+  <%= form_tag({}, :method => :get) do %>
+    <h3><%= l(:label_project_plural) %></h3>
+    <label for="closed"><%= check_box_tag 'closed', 1, params[:closed] %> <%= l(:label_show_closed_projects) %></label>
+    <p><%= submit_tag l(:button_apply), :class => 'button-small', :name => nil %></p>
+  <% end %>
+
 <h2><%= l(:label_project_plural) %></h2>
 
 <div id="projects-index">
@@ -34,16 +40,10 @@
               </span>
             </td>
             <td>
-              <%= link_to project.issues.count, project_path(id: project.id, jump: :issues) %>
-              <%= link_to (content_tag(:i, 'add', class: 'material-icons') +
-         (content_tag(:span, l(:label_issue_new), class: 'mdl-tooltip', for: "org-table-add-issue-#{project.id}"))), new_project_issue_path(project), id: "org-table-add-issue-#{project.id}" %>
+              <%= org_issues_column(project) %>
             </td>
             <td>
-              <% project.organizations.each do |organization| -%>
-                <span>
-                  <%= link_to_organization organization %>
-                </span>
-              <% end %>
+              <%= org_organizations_column(project) %>
             </td>
             <% unless project.custom_field_values.empty? -%>
               <% project.custom_field_values.each do |custom| -%>
@@ -69,14 +69,6 @@
 
 <% other_formats_links do |f| %>
   <%= f.link_to 'Atom', :url => {:key => User.current.rss_key} %>
-<% end %>
-
-<% content_for :sidebar do %>
-  <%= form_tag({}, :method => :get) do %>
-    <h3><%= l(:label_project_plural) %></h3>
-    <label for="closed"><%= check_box_tag 'closed', 1, params[:closed] %> <%= l(:label_show_closed_projects) %></label>
-    <p><%= submit_tag l(:button_apply), :class => 'button-small', :name => nil %></p>
-  <% end %>
 <% end %>
 
 <% html_title(l(:label_project_plural)) -%>
