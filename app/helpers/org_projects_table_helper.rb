@@ -63,7 +63,7 @@ module OrgProjectsTableHelper
     else
       content_tag(:span) do
         link_to (content_tag(:span, org.fullname) +
-                 (content_tag(:span, roles.join("<br>"), class: 'mdl-tooltip',
+                 (content_tag(:span, roles.join("<br>").html_safe, class: 'mdl-tooltip',
                               for: "org-table-project-#{project.id}-organization-#{org.id}"))),
                 organization_path(org),
                 id: "org-table-project-#{project.id}-organization-#{org.id}"

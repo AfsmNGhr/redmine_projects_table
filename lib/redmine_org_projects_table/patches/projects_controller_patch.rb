@@ -1,6 +1,5 @@
 require_dependency 'application_controller'
 require_dependency 'projects_controller'
-require_dependency 'sort_helper'
 
 module RedmineOrgProjectsTable::Patches::ProjectsControllerPatch
   def self.included(base)
@@ -8,8 +7,6 @@ module RedmineOrgProjectsTable::Patches::ProjectsControllerPatch
     base.send(:include, InstanceMethods)
     base.class_eval do
       unloadable
-      helper :sort
-      include SortHelper
       alias_method_chain :index, :table
     end
   end
