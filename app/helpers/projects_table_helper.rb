@@ -3,27 +3,31 @@ module ProjectsTableHelper
   def issue_links(project)
     {
       all: {
-        caption: project.issues.count,
+        caption: Project.where(id: project.id).joins(:issues).count,
         class: 'issues-all',
         label: l(:label_issues_all),
         path: "/issues?utf8=✓&set_filter=1&f[]=status_id&op[status_id]=*&f[]=project_id&op[project_id]==&v[project_id][]=#{project.id}",
-        id: "org-table-issues-all-#{project.id}"
+        id: "projects-table-issues-all-#{project.id}"
       },
 
       close: {
-        caption: project.issues.where(status_id: 3).count,
+        caption: Project.where(id: project.id).joins(:issues).
+          where("issues.status_id IN" +
+                "(SELECT id FROM issue_statuses WHERE is_closed='t')").count,
         class: 'issues-close',
         label: l(:label_issues_close),
-        path: "/issues?utf8=✓&set_filter=1&f[]=status_id&op[status_id]==&v[status_id][]=3&f[]=project_id&op[project_id]==&v[project_id][]=#{project.id}",
-        id: "org-table-issues-close-#{project.id}"
+        path: "/issues?utf8=✓&set_filter=1&f[]=status_id&op[status_id]=c&f[]=project_id&op[project_id]==&v[project_id][]=#{project.id}",
+        id: "projects-table-issues-close-#{project.id}"
       },
 
       open: {
-        caption: project.issues.where(status_id: 1).count,
+        caption: Project.where(id: project.id).joins(:issues).
+          where("issues.status_id IN " +
+                "(SELECT id FROM issue_statuses WHERE is_closed='f')").count,
         class: 'issues-open',
         label: l(:label_issues_open),
-        path: "/issues?utf8=✓&set_filter=1&f[]=status_id&op[status_id]==&v[status_id][]=1&f[]=project_id&op[project_id]==&v[project_id][]=#{project.id}",
-        id: "org-table-issues-open-#{project.id}"
+        path: "/issues?utf8=✓&set_filter=1&f[]=status_id&op[status_id]=o&f[]=project_id&op[project_id]==&v[project_id][]=#{project.id}",
+        id: "projects-table-issues-open-#{project.id}"
       },
 
       add: {
@@ -31,7 +35,7 @@ module ProjectsTableHelper
         class: 'material-icons',
         label: l(:label_issue_new),
         path: new_project_issue_path(project),
-        id: "org-table-issue-add-#{project.id}"
+        id: "projects-table-issue-add-#{project.id}"
       }
     }
   end
