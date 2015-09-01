@@ -38,10 +38,10 @@
               </span>
             </td>
             <td>
-              <%= org_issues_column(project) %>
+              <%= issues_column(project) %>
             </td>
             <td>
-              <%= org_organizations_column(project) %>
+              <%= organizations_column(project) %>
             </td>
             <% unless project.custom_field_values.empty? -%>
               <% project.custom_field_values.each do |custom| -%>

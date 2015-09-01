@@ -1,5 +1,5 @@
 # coding: utf-8
-module OrgProjectsTableHelper
+module ProjectsTableHelper
   def issue_links(project)
     {
       all: {
@@ -36,27 +36,27 @@ module OrgProjectsTableHelper
     }
   end
 
-  def org_issues_column(project, column=[], links=issue_links(project))
+  def issues_column(project, column=[], links=issue_links(project))
     links.keys.each do |key|
-      column << org_issues_node(project, links[key])
+      column << issues_node(project, links[key])
     end
     column.empty? ? nil : column.join("\n").html_safe
   end
 
-  def org_issues_node(project, link)
+  def issues_node(project, link)
     link_to (content_tag(:span, link[:caption], class: link[:class]) +
              (content_tag(:span, link[:label], class: 'mdl-tooltip',
                           for: link[:id]))), link[:path], id: link[:id]
   end
 
-  def org_organizations_column(project, column=[])
+  def organizations_column(project, column=[])
     project.organizations.each do |org|
-      column << org_organizations_node(org, project)
+      column << organizations_node(org, project)
     end
     column.empty? ? nil : column.join("\n").html_safe
   end
 
-  def org_organizations_node(org, project)
+  def organizations_node(org, project)
     roles = org.organization_roles.map { |r| r.role.name }.compact.uniq
     if roles.empty?
       content_tag(:span, content_tag(:span, (link_to_organization org)))

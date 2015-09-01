@@ -1,6 +1,6 @@
 require_dependency 'projects_helper'
 
-module RedmineOrgProjectsTable::Patches::ProjectsHelperPatch
+module RedmineProjectsTable::Patches::ProjectsHelperPatch
   def self.included(base)
     base.extend(ClassMethods)
     base.send(:include, InstanceMethods)
@@ -32,4 +32,4 @@ module RedmineOrgProjectsTable::Patches::ProjectsHelperPatch
 end
 
 ProjectsHelper.send :include,
-                    RedmineOrgProjectsTable::Patches::ProjectsHelperPatch
+                    RedmineProjectsTable::Patches::ProjectsHelperPatch

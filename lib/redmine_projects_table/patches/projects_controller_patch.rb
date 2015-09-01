@@ -1,7 +1,7 @@
 require_dependency 'application_controller'
 require_dependency 'projects_controller'
 
-module RedmineOrgProjectsTable::Patches::ProjectsControllerPatch
+module RedmineProjectsTable::Patches::ProjectsControllerPatch
   def self.included(base)
     base.extend(ClassMethods)
     base.send(:include, InstanceMethods)
@@ -40,4 +40,4 @@ module RedmineOrgProjectsTable::Patches::ProjectsControllerPatch
 end
 
 ProjectsController.send :include,
-       RedmineOrgProjectsTable::Patches::ProjectsControllerPatch
+       RedmineProjectsTable::Patches::ProjectsControllerPatch
