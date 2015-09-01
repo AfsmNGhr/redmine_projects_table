@@ -13,7 +13,7 @@ module ProjectsTableHelper
       close: {
         caption: Project.where(id: project.id).joins(:issues).
           where("issues.status_id IN" +
-                "(SELECT id FROM issue_statuses WHERE is_closed='#{true}')").count,
+                "(SELECT id FROM issue_statuses WHERE is_closed=?)", true).count,
         class: 'issues-close',
         label: l(:label_issues_close),
         path: "/issues?utf8=✓&set_filter=1&f[]=status_id&op[status_id]=c&f[]=project_id&op[project_id]==&v[project_id][]=#{project.id}",
@@ -23,7 +23,7 @@ module ProjectsTableHelper
       open: {
         caption: Project.where(id: project.id).joins(:issues).
           where("issues.status_id IN" +
-                "(SELECT id FROM issue_statuses WHERE is_closed='#{false}')").count,
+                "(SELECT id FROM issue_statuses WHERE is_closed=?)", false).count,
         class: 'issues-open',
         label: l(:label_issues_open),
         path: "/issues?utf8=✓&set_filter=1&f[]=status_id&op[status_id]=o&f[]=project_id&op[project_id]==&v[project_id][]=#{project.id}",
