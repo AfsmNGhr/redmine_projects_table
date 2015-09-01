@@ -16,28 +16,58 @@ module RedmineProjectsTable::Patches::ProjectsControllerPatch
 
   module InstanceMethods
     def index_with_table
-      @custom_fields = ProjectCustomField.all
-      @status = params[:status] || 1
-      scope = Project.visible.status(@status).sorted
-      scope = scope.like(params[:name]) if params[:name].present?
+      retrieve_query
+      sort_init(@query.sort_criteria.empty? ? [['id', 'desc']] : @query.sort_criteria)
+      sort_update(@query.sortable_columns)
+      @query.sort_criteria = sort_criteria.to_a
 
-      respond_to do |format|
-        format.html {
-          @projects = scope.to_a
-        }
-        format.api {
-          @project_count = scope.count
+      if @query.valid?
+        case params[:format]
+        when 'xml', 'json'
           @offset, @limit = api_offset_and_limit
-          @projects = scope.offset(@offset).limit(@limit).to_a
-        }
-        format.atom {
-          projects = scope.reorder(:created_on => :desc).limit(Setting.feeds_limit.to_i).to_a
-          render_feed(projects, :title => "#{Setting.app_title}: #{l(:label_project_latest)}")
-        }
+          @query.column_names = %w(project)
+        when 'atom'
+          @limit = Setting.feeds_limit.to_i
+        else
+          @limit = per_page_option
+        end
+
+        @project_count = @query.project_count
+        @project_pages = Paginator.new @project_count, @limit, params['page']
+        @offset ||= @project_pages.offset
+        @projects = @query.projects(include: [:domains],
+                                    order: sort_clause,
+                                    offset: @offset,
+                                    limit: @limit)
+        @project_count_by_group = @query.project_count_by_group
+
+        respond_to do |format|
+          format.html
+          format.api
+          format.atom {
+            render_feed(@projects, title: "#{Setting.app_title}:" +
+                                   "#{l(:label_project_latest)}") }
+        end
+      else
+        respond_to do |format|
+          format.html
+          format.api { render_validation_errors(@query) }
+          format.atom { render nothing: true }
+        end
       end
+    rescue ActiveRecord::RecordNotFound
+      render_404
     end
   end
 end
 
 ProjectsController.send :include,
        RedmineProjectsTable::Patches::ProjectsControllerPatch
+
+class ProjectsController
+  default_search_scope :projects
+  rescue_from Query::StatementInvalid, with: :query_statement_invalid
+  include QueriesHelper
+  helper :sort
+  include SortHelper
+end

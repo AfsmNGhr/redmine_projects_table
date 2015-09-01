@@ -42,12 +42,12 @@ module ProjectsTableHelper
 
   def issues_column(project, column=[], links=issue_links(project))
     links.keys.each do |key|
-      column << issues_node(project, links[key])
+      column << issues_node(links[key])
     end
     column.empty? ? nil : column.join("\n").html_safe
   end
 
-  def issues_node(project, link)
+  def issues_node(link)
     link_to (content_tag(:span, link[:caption], class: link[:class]) +
              (content_tag(:span, link[:label], class: 'mdl-tooltip',
                           for: link[:id]))), link[:path], id: link[:id]

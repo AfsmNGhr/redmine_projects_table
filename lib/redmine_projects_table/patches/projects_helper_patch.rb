@@ -1,3 +1,4 @@
+# coding: utf-8
 require_dependency 'projects_helper'
 
 module RedmineProjectsTable::Patches::ProjectsHelperPatch
@@ -20,7 +21,7 @@ module RedmineProjectsTable::Patches::ProjectsHelperPatch
         links << link_to(l(:label_project_new), new_project_path, class: 'mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect mdl-color-text--white')
       end
       if User.current.allowed_to?(:view_issues, nil, global: true)
-        links << link_to(l(:label_issue_view_all), issues_path, class: 'mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-color--purple-400 mdl-js-ripple-effect mdl-color-text--white')
+        links << link_to(l(:label_issue_view_all), '/issues?utf8=✓&set_filter=1&f[]=status_id&op[status_id]=*', class: 'mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-color--purple-400 mdl-js-ripple-effect mdl-color-text--white')
       end
       if User.current.allowed_to?(:view_time_entries, nil, global: true)
         links << link_to(l(:label_overall_spent_time), time_entries_path, class: 'mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-color--indigo-400 mdl-js-ripple-effect mdl-color-text--white')
