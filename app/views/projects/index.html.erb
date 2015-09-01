@@ -9,10 +9,8 @@
   <%= form_tag({}, :method => :get) do %>
     <h3><%= l(:label_project_plural) %></h3>
     <label for="closed"><%= check_box_tag 'closed', 1, params[:closed] %> <%= l(:label_show_closed_projects) %></label>
-    <p><%= submit_tag l(:button_apply), :class => 'button-small', :name => nil %></p>
+    <h2><%= submit_tag l(:button_apply), name: nil, class: 'mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect mdl-color-text--white' %></h2>
   <% end %>
-
-<h2><%= l(:label_project_plural) %></h2>
 
 <div id="projects-index">
   <div class="autoscroll">
@@ -62,9 +60,10 @@
 </div>
 
 <% if User.current.logged? %>
-<p style="text-align:right;">
-<span class="my-project"><%= l(:label_my_projects) %></span>
-</p>
+  <br>
+  <p style="text-align:right;">
+    <span class="my-project"><%= l(:label_my_projects) %></span>
+  </p>
 <% end %>
 
 <% other_formats_links do |f| %>
