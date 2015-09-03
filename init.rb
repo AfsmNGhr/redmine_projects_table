@@ -3,6 +3,8 @@ require 'redmine'
 ActionDispatch::Callbacks.to_prepare do
   require 'redmine_projects_table/patches/projects_controller_patch'
   require 'redmine_projects_table/patches/projects_helper_patch'
+  require 'redmine_projects_table/patches/project_patch'
+  require 'redmine_projects_table/patches/queries_helper_patch'
   ActionView::Base.send(:include, ProjectsTableHelper)
 end
 

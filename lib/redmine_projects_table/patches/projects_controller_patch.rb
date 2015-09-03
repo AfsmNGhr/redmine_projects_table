@@ -16,8 +16,9 @@ module RedmineProjectsTable::Patches::ProjectsControllerPatch
 
   module InstanceMethods
     def index_with_table
-      retrieve_query
-      sort_init(@query.sort_criteria.empty? ? [['id', 'desc']] : @query.sort_criteria)
+      retrieve_self_query
+      sort_init(
+        @query.sort_criteria.empty? ? [%w(id desc)] : @query.sort_criteria)
       sort_update(@query.sortable_columns)
       @query.sort_criteria = sort_criteria.to_a
 
@@ -33,7 +34,9 @@ module RedmineProjectsTable::Patches::ProjectsControllerPatch
         end
 
         @project_count = @query.project_count
-        @project_pages = Paginator.new @project_count, @limit, params['page']
+        @project_pages = Redmine::Pagination::Paginator.new(
+          @project_count,
+          @limit, params['page'])
         @offset ||= @project_pages.offset
         @projects = @query.projects(include: [:domains],
                                     order: sort_clause,
@@ -45,8 +48,9 @@ module RedmineProjectsTable::Patches::ProjectsControllerPatch
           format.html
           format.api
           format.atom {
-            render_feed(@projects, title: "#{Setting.app_title}:" +
-                                   "#{l(:label_project_latest)}") }
+            render_feed(@projects, title: "#{Setting.app_title}:" \
+                                          "#{l(:label_project_latest)}")
+          }
         end
       else
         respond_to do |format|
