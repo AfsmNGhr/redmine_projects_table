@@ -119,7 +119,8 @@ module ProjectsTableHelper
 
   def project_column_content(column, project)
     value = column.value_object(project)
-    if value.is_a?(Array) || value.is_a?(ActiveRecord::Relation)
+    if value.is_a?(Array) ||
+       (value.is_a?(ActiveRecord::Relation) && column.name != :issues)
       value.collect do |v|
         project_column_value(column, project, v)
       end.compact.join(', ').html_safe
