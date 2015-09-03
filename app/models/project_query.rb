@@ -185,7 +185,7 @@ class ProjectQuery < Query
   end
 
   def project_count
-    Project.visible.joins(:domains, :organizations, :issues).
+    Project.visible.includes(:domains, :organizations, :issues).
       where(statement).count
   rescue ::ActiveRecord::StatementInvalid => e
     raise StatementInvalid.new(e.message)
@@ -199,7 +199,7 @@ class ProjectQuery < Query
         # Rails3 will raise an (unexpected) RecordNotFound
         # if there's only a nil group value
         r = Project.visible.
-          joins(:domains, :organizations, :issues).
+          includes(:domains, :organizations, :issues).
           where(statement).
           joins(joins_for_order_statement(group_by_statement)).
           group(group_by_statement).
@@ -268,9 +268,8 @@ class ProjectQuery < Query
                    flatten.reject(&:blank?)
 
     scope = Project.visible.
-            joins(:domains, :organizations, :issues).
             where(statement).
-            includes(([:domains] + (options[:include] || [])).uniq).
+            includes(([:domains, :organizations, :issues] + (options[:include] || [])).uniq).
             where(options[:conditions]).
             order(order_option).
             joins(joins_for_order_statement(order_option.join(','))).
