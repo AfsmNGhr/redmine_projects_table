@@ -99,7 +99,7 @@ module ProjectsTableHelper
 
   def grouped_project_list(projects, query, project_count_by_group, &block)
     previous_group, first = false, true
-    project_list(projects) do |project, level|
+    project_tree(projects) do |project, level|
       group_name = group_count = nil
       if query.grouped? && (
            (group = query.group_by_column.value(project)) !=
