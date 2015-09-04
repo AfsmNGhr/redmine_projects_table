@@ -89,11 +89,6 @@ class ProjectQuery < Query
   end
 
   def initialize_available_filters
-    principals = []
-    subprojects = []
-    versions = []
-    projects_custom_fields = []
-
     # principals += project.principals.visible
 
     # unless project.leaf?
@@ -101,8 +96,8 @@ class ProjectQuery < Query
     #   principals += Principal.member_of(subprojects).visible
     # end
 
-    # versions = project.shared_versions.to_a
-    # categories = project.issue_categories.to_a
+    #versions = Project.visible.map(&:shared_versions)
+    #subprojects = Project.visible.map(&:children)
     projects_custom_fields = ProjectCustomField.where(is_for_all: true)
 
     # principals.uniq!
@@ -129,11 +124,11 @@ class ProjectQuery < Query
       :type => :list_optional, :values => role_values
     ) unless role_values.empty?
 
-    if versions.any?
-      add_available_filter "fixed_version_id",
-        :type => :list_optional,
-        :values => versions.sort.collect{|s| ["#{s.project.name} - #{s.name}", s.id.to_s] }
-    end
+    # if versions.any?
+    #   add_available_filter "fixed_version_id",
+    #     :type => :list_optional,
+    #     :values => versions.sort.collect{|s| ["#{s.project.name} - #{s.name}", s.id.to_s] }
+    # end
 
     # if categories.any?
     #   add_available_filter "category_id",
@@ -162,11 +157,12 @@ class ProjectQuery < Query
     #    :type => :list, :values => [["<< #{l(:label_me)} >>", "me"]]
     #end
 
-    if subprojects.any?
-      add_available_filter "subproject_id",
-        :type => :list_subprojects,
-        :values => subprojects.collect{|s| [s.name, s.id.to_s] }
-    end
+    # if subprojects.any?
+    #   add_available_filter 'subproject_id',
+    #                        type: :list_subprojects,
+    #                        values:
+    #                          subprojects.collect { |s| [s.name, s.id.to_s] }
+    # end
 
     add_custom_fields_filters(projects_custom_fields)
 
@@ -224,36 +220,6 @@ class ProjectQuery < Query
     @available_columns += ProjectCustomField.visible.
                          collect { |cf| QueryCustomFieldColumn.new(cf) }
 
-    # with time_entries ...
-    # if User.current.allowed_to?(:view_time_entries, project, global: true)
-    #   index = nil
-    #   @available_columns.each_with_index {
-    #     |column, i| index = i if column.name == :estimated_hours }
-    #   index = (index ? index + 1 : -1)
-    #   # insert the column after estimated_hours or at the end
-    #   @available_columns.
-    #     insert index, QueryColumn.new(
-    #              :spent_hours,
-    #              sortable: "COALESCE((SELECT SUM(hours) " +
-    #              " FROM #{TimeEntry.table_name} " +
-    #              " WHERE #{TimeEntry.table_name}.issue_id = " +
-    #              " #{Issue.table_name}.id), 0) ",
-    #              default_order: 'desc',
-    #              caption: :label_spent_time )
-    #   @available_columns.
-    #     insert index+1, QueryColumn.new(
-    #              :total_spent_hours,
-    #              sortable: "COALESCE((SELECT SUM(hours) " +
-    #              " FROM #{TimeEntry.table_name} " +
-    #              " JOIN #{Issue.table_name} subtasks " +
-    #              " ON subtasks.id = #{TimeEntry.table_name}.issue_id" +
-    #              " WHERE subtasks.root_id = #{Issue.table_name}.root_id " +
-    #              " AND subtasks.lft >= #{Issue.table_name}.lft " +
-    #              " AND subtasks.rgt <= #{Issue.table_name}.rgt), 0)",
-    #              default_order: 'desc',
-    #              caption: :label_total_spent_time )
-    # end
-
     disabled_fields = Tracker.disabled_core_fields(trackers).
                       map { |field| field.sub(/_id$/, '') }
     @available_columns.reject! { |column|
@@ -264,7 +230,7 @@ class ProjectQuery < Query
   end
 
   def projects(options={})
-    order_option = [ group_by_sort_order, options[:order] ].
+    order_option = [group_by_sort_order, options[:order]].
                    flatten.reject(&:blank?)
 
     scope = Project.visible.
@@ -276,8 +242,7 @@ class ProjectQuery < Query
             limit(options[:limit]).
             offset(options[:offset])
 
-    scope = scope.preload(:custom_values)
-    projects = scope.to_a
+    scope.preload(:custom_values).to_a
   rescue ::ActiveRecord::StatementInvalid => e
     raise StatementInvalid.new(e.message)
   end

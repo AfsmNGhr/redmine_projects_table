@@ -38,8 +38,7 @@ module RedmineProjectsTable::Patches::ProjectsControllerPatch
           @project_count,
           @limit, params['page'])
         @offset ||= @project_pages.offset
-        @projects = @query.projects(include: [:domains],
-                                    order: sort_clause,
+        @projects = @query.projects(order: sort_clause,
                                     offset: @offset,
                                     limit: @limit)
         @project_count_by_group = @query.project_count_by_group

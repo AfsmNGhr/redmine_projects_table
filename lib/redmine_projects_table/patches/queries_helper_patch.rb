@@ -1,9 +1,11 @@
 module QueriesHelper
   def retrieve_self_query
+    session[:query].reject! { |f| f == :filters }
     if !params[:query_id].blank?
       cond = 'project_id IS NULL'
       cond << " OR project_id = #{@project.id}" if @project
-      @query = ProjectQuery.where(cond).find(params[:query_id])
+      @query =
+        ProjectQuery.where(cond).find(params[:query_id])
       fail ::Unauthorized unless @query.visible?
       @query.project = @project
       session[:query] = { id: @query.id, project_id: @query.project_id }
