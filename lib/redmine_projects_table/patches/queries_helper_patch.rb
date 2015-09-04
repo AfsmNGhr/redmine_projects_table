@@ -1,6 +1,6 @@
 module QueriesHelper
   def retrieve_self_query
-    session[:query].reject! { |f| f == :filters }
+    session[:query].reject! { |f| f == :filters } if session[:query]
     if !params[:query_id].blank?
       cond = 'project_id IS NULL'
       cond << " OR project_id = #{@project.id}" if @project
