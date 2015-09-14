@@ -3,25 +3,20 @@ class ProjectQuery < Query
   self.queried_class = Project
 
   self.available_columns = [
-    QueryColumn.new(:id, sortable: "#{Project.table_name}.id",
-                    default_order: 'desc', caption: '#', frozen: true),
-    QueryColumn.new(:name, sortable: "#{Project.table_name}.name",
-                    caption: :label_project, frozen: true),
-    QueryColumn.new(:issues, sortable: ["#{Issue.table_name}.id DESC",
-                                        "#{Issue.table_name}.subject"],
-                    caption: :label_issue_plural, frozen: true),
-    QueryColumn.new(:organizations, sortable: ["#{Organization.table_name}.id DESC",
-                                               "#{Organization.table_name}.name"],
-                    caption: :label_organization_plural, frozen: true),
+    QueryColumn.new(:id, default_order: 'desc', caption: '#', frozen: true),
+    QueryColumn.new(:name, caption: :label_project, frozen: true),
+    QueryColumn.new(:issues, caption: :label_issue_plural, frozen: true),
+    QueryColumn.new(:organizations, caption: :label_organization_plural,
+                    frozen: true),
     QueryColumn.new(:domains, sortable: "#{Domain.table_name}.name",
                     caption: :label_domain_plural, frozen: true),
     QueryColumn.new(:updated_on, sortable: "#{Project.table_name}.updated_on",
-                    default_order: 'desc',frozen: true),
+                    default_order: 'desc', frozen: true),
     QueryColumn.new(:parent, sortable: ["#{Project.table_name}.parent_id",
                                         "#{Project.table_name}.lft ASC"],
                     default_order: 'desc', caption: :field_parent_project),
     QueryColumn.new(:status, sortable: "#{Project.table_name}.status"),
-    QueryColumn.new(:contracts, sortable: "#{Contract.table_name}.title"),
+    QueryColumn.new(:contracts, default_order: 'asc'),
     QueryColumn.new(:description, inline: false),
     QueryColumn.new(:created_on, sortable: "#{Project.table_name}.created_on",
                     default_order: 'desc')
@@ -192,8 +187,7 @@ class ProjectQuery < Query
   end
 
   def project_count
-    Project.visible.includes(including).
-      where(statement).count
+    Project.visible.includes(including).where(statement).count
   rescue ::ActiveRecord::StatementInvalid => e
     raise StatementInvalid.new(e.message)
   end
@@ -206,11 +200,9 @@ class ProjectQuery < Query
         # Rails3 will raise an (unexpected) RecordNotFound
         # if there's only a nil group value
         r = Project.visible.
-          includes(including).
-          where(statement).
+          includes(including).where(statement).
           joins(joins_for_order_statement(group_by_statement)).
-          group(group_by_statement).
-          count
+          group(group_by_statement).count
       rescue ActiveRecord::RecordNotFound
         r = { nil: project_count }
       end
