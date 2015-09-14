@@ -87,6 +87,20 @@ module ProjectsTableHelper
     link_to domain.name, domain_path(domain)
   end
 
+  def contracts_column(project, column=[])
+    project.contracts.includes(:category).each do |contract|
+      column << contract_node(contract)
+    end
+    column.empty? ? nil : column.join(', ').html_safe
+  end
+
+  def contract_node(contract)
+    link_to (content_tag(:span, contract.title) +
+             (content_tag(:span, contract.category, class: 'mdl-tooltip',
+              for: "#{contract.id}"))), contract_path(contract),
+            id: "#{contract.id}"
+  end
+
   def project_list(projects, &block)
     ancestors = []
     projects.each do |project|
@@ -120,13 +134,18 @@ module ProjectsTableHelper
 
   def project_column_content(column, project)
     value = column.value_object(project)
-    if value.is_a?(Array) ||
-       (value.is_a?(ActiveRecord::Relation) && column.name != :issues)
-      value.collect do |v|
-        project_column_value(column, project, v)
-      end.compact.join(', ').html_safe
+    case column.name
+    when :contracts
+      contracts_column(project)
     else
-      project_column_value(column, project, value)
+      if value.is_a?(Array) ||
+         (value.is_a?(ActiveRecord::Relation) && column.name != :issues)
+        value.collect do |v|
+          project_column_value(column, project, v)
+        end.compact.join(', ').html_safe
+      else
+        project_column_value(column, project, value)
+      end
     end
   end
 
@@ -151,8 +170,6 @@ module ProjectsTableHelper
       issues_column(project)
     when :domains
       domain_node(value)
-    when :contracts
-      link_to value.title, contract_path(value)
     when :organizations
       organization_node(value, project)
     else
