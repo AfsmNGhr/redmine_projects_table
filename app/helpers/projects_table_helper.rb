@@ -61,7 +61,8 @@ module ProjectsTableHelper
   end
 
   def organization_node(org, project)
-    roles = org.organization_roles.map { |r| r.role.name }.compact.uniq
+    roles = org.organization_roles.
+            includes(:role).map { |r| r.role.name }.compact.uniq
     if roles.empty?
       content_tag(:span, content_tag(:span, (link_to_organization org)))
     else
@@ -150,6 +151,8 @@ module ProjectsTableHelper
       issues_column(project)
     when :domains
       domain_node(value)
+    when :contracts
+      link_to l(:label_contract_plural), project_contracts_path(project)
     when :organizations
       organization_node(value, project)
     else

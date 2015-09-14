@@ -4,4 +4,5 @@ ru:
   label_issues_close: 'Выполненные задачи'
 
   field_parent_project: 'Родительский проект'
+  field_contracts: 'Договоры'
   setting_project_list_default_columns: 'Столбцы, отображаемые в списке проектов по умолчанию'
