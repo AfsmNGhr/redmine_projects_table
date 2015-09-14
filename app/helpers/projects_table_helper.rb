@@ -139,8 +139,12 @@ module ProjectsTableHelper
       contracts_column(project)
     when :issues
       issues_column(project)
+    when :domains
+      domains_column(project)
+    when :organizations
+      organizations_column(project)
     else
-      if value.is_a?(Array) || value.is_a?(ActiveRecord::Relation)
+      if value.is_a?(Array)
         value.collect do |v|
           project_column_value(column, project, v)
         end.compact.join(', ').html_safe
@@ -167,10 +171,6 @@ module ProjectsTableHelper
       else
         ''
       end
-    when :domains
-      domain_node(value)
-    when :organizations
-      organization_node(value, project)
     else
       format_object(value)
     end

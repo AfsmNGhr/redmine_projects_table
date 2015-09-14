@@ -181,8 +181,18 @@ class ProjectQuery < Query
     }
   end
 
+  def including(includes = [])
+    available_columns.collect do |column|
+      case column.name
+      when :domains
+        includes << column.name
+      end
+    end
+    includes
+  end
+
   def project_count
-    Project.visible.includes(:domains, :organizations, :issues).
+    Project.visible.includes(including).
       where(statement).count
   rescue ::ActiveRecord::StatementInvalid => e
     raise StatementInvalid.new(e.message)
@@ -196,7 +206,7 @@ class ProjectQuery < Query
         # Rails3 will raise an (unexpected) RecordNotFound
         # if there's only a nil group value
         r = Project.visible.
-          includes(:domains, :organizations, :issues).
+          includes(including).
           where(statement).
           joins(joins_for_order_statement(group_by_statement)).
           group(group_by_statement).
@@ -236,14 +246,15 @@ class ProjectQuery < Query
 
     scope = Project.visible.
             where(statement).
-            includes(([:domains, :organizations, :issues] + (options[:include] || [])).uniq).
+            includes((including + (options[:include] || [])).uniq).
             where(options[:conditions]).
             order(order_option).
             joins(joins_for_order_statement(order_option.join(','))).
             limit(options[:limit]).
             offset(options[:offset])
 
-    scope.preload(:custom_values).to_a
+    scope.preload(:custom_values) unless ProjectCustomField.all.empty?
+    scope.to_a
   rescue ::ActiveRecord::StatementInvalid => e
     raise StatementInvalid.new(e.message)
   end
