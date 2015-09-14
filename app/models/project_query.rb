@@ -21,7 +21,7 @@ class ProjectQuery < Query
                                         "#{Project.table_name}.lft ASC"],
                     default_order: 'desc', caption: :field_parent_project),
     QueryColumn.new(:status, sortable: "#{Project.table_name}.status"),
-    QueryColumn.new(:contracts, sortable: "#{Contract.table_name}.name"),
+    QueryColumn.new(:contracts, sortable: "#{Contract.table_name}.title"),
     QueryColumn.new(:description, inline: false),
     QueryColumn.new(:created_on, sortable: "#{Project.table_name}.created_on",
                     default_order: 'desc')

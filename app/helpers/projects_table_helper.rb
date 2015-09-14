@@ -152,7 +152,7 @@ module ProjectsTableHelper
     when :domains
       domain_node(value)
     when :contracts
-      link_to l(:label_contract_plural), project_contracts_path(project)
+      link_to value.title, contract_path(value)
     when :organizations
       organization_node(value, project)
     else
