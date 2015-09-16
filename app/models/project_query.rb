@@ -8,11 +8,9 @@ class ProjectQuery < Query
     QueryColumn.new(:organizations, caption: :label_organization_plural),
     QueryColumn.new(:domains, sortable: "#{Domain.table_name}.name",
                     caption: :label_domain_plural),
-    QueryColumn.new(:parent, sortable: ["#{Project.table_name}.parent_id",
-                                        "#{Project.table_name}.lft ASC"],
-                    default_order: 'desc', caption: :field_parent_project),
+    QueryColumn.new(:parent, caption: :field_parent_project),
     QueryColumn.new(:contracts, default_order: 'asc'),
-    QueryColumn.new(:description, inline: false),
+    QueryColumn.new(:description, inline: false)
   ]
 
   scope :visible, lambda {|*args|
