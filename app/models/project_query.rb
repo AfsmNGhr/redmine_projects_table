@@ -3,22 +3,16 @@ class ProjectQuery < Query
   self.queried_class = Project
 
   self.available_columns = [
-    QueryColumn.new(:id, default_order: 'desc', caption: '#'),
     QueryColumn.new(:name, caption: :label_project),
     QueryColumn.new(:issues, caption: :label_issue_plural),
     QueryColumn.new(:organizations, caption: :label_organization_plural),
     QueryColumn.new(:domains, sortable: "#{Domain.table_name}.name",
                     caption: :label_domain_plural),
-    QueryColumn.new(:updated_on, sortable: "#{Project.table_name}.updated_on",
-                    default_order: 'desc'),
     QueryColumn.new(:parent, sortable: ["#{Project.table_name}.parent_id",
                                         "#{Project.table_name}.lft ASC"],
                     default_order: 'desc', caption: :field_parent_project),
-    QueryColumn.new(:status, sortable: "#{Project.table_name}.status"),
     QueryColumn.new(:contracts, default_order: 'asc'),
     QueryColumn.new(:description, inline: false),
-    QueryColumn.new(:created_on, sortable: "#{Project.table_name}.created_on",
-                    default_order: 'desc')
   ]
 
   scope :visible, lambda {|*args|
