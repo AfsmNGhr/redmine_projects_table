@@ -3,15 +3,14 @@ class ProjectQuery < Query
   self.queried_class = Project
 
   self.available_columns = [
-    QueryColumn.new(:id, default_order: 'desc', caption: '#', frozen: true),
-    QueryColumn.new(:name, caption: :label_project, frozen: true),
-    QueryColumn.new(:issues, caption: :label_issue_plural, frozen: true),
-    QueryColumn.new(:organizations, caption: :label_organization_plural,
-                    frozen: true),
+    QueryColumn.new(:id, default_order: 'desc', caption: '#'),
+    QueryColumn.new(:name, caption: :label_project),
+    QueryColumn.new(:issues, caption: :label_issue_plural),
+    QueryColumn.new(:organizations, caption: :label_organization_plural),
     QueryColumn.new(:domains, sortable: "#{Domain.table_name}.name",
-                    caption: :label_domain_plural, frozen: true),
+                    caption: :label_domain_plural),
     QueryColumn.new(:updated_on, sortable: "#{Project.table_name}.updated_on",
-                    default_order: 'desc', frozen: true),
+                    default_order: 'desc'),
     QueryColumn.new(:parent, sortable: ["#{Project.table_name}.parent_id",
                                         "#{Project.table_name}.lft ASC"],
                     default_order: 'desc', caption: :field_parent_project),
@@ -230,6 +229,14 @@ class ProjectQuery < Query
     }
 
     @available_columns
+  end
+
+  def default_columns_names
+    @default_columns_names ||=
+      begin
+        default_columns = [:name, :issues, :organizations, :domains]
+        project.present? ? default_columns : [:project] | default_columns
+      end
   end
 
   def projects(options={})

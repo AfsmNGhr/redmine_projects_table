@@ -5,4 +5,5 @@ ru:
 
   field_parent_project: 'Родительский проект'
   field_contracts: 'Договоры'
-  setting_project_list_default_columns: 'Столбцы, отображаемые в списке проектов по умолчанию'
+
+  text_are_you_sure_archive: 'Вы точно хотите архивировать проект?'

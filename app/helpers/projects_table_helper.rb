@@ -156,8 +156,19 @@ module ProjectsTableHelper
 
   def project_column_value(column, project, value)
     case column.name
-    when :id, :name
+    when :id
       link_to value, project_path(project)
+    when :name
+      links = []
+      links << link_to(value, project_path(project))
+      if User.current.admin?
+        links << link_to('', archive_project_path(project),
+                         data: { confirm: l(:text_are_you_sure_archive) },
+                         class: 'icon icon-lock',
+                         id: "archive-#{project.id}",
+                         method: :post)
+      end
+      links.join("\n").html_safe
     when :parent
       if value
         value.visible? ? link_to_project(value) : "##{value.id}"
